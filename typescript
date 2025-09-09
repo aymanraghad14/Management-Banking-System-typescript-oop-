@@ -1,0 +1,144 @@
+interface IAccountData {
+  Acc_no: number;
+  Balance: number;
+  date_of_opening: Date;
+}
+
+interface IAccount {
+  debitAmount(amount: number): boolean;
+  creditAmount(amount: number): void;
+  getBalance(): number;
+}
+
+abstract class Account implements IAccountData, IAccount {
+  Acc_no: number;
+  Balance: number;
+  date_of_opening: Date;
+
+  constructor(protected _Acc_no: number, protected _Balance: number, protected _date_of_opening: Date) {
+    this.Acc_no = _Acc_no;
+    this.Balance = _Balance;
+    this.date_of_opening = _date_of_opening;
+  }
+
+  abstract addCustomer(): void;
+  abstract removeCustomer(): void;
+
+  debitAmount(amount: number): boolean {
+    if (amount <= 0) {
+      console.log("Invalid amount");
+      return false;
+    }
+
+    if (this.Balance >= amount) {
+      this.Balance -= amount;
+      console.log(`Debited: ${amount}. New Balance: ${this.Balance}`);
+      return true;
+    } else {
+      console.log("Insufficient balance");
+      return false;
+    }
+  }
+
+  creditAmount(amount: number): void {
+    if (amount <= 0) {
+      console.log("Invalid amount");
+      return;   
+    }
+    
+    this.Balance += amount;
+    console.log(`Credited: ${amount}. New Balance: ${this.Balance}`);
+  }
+
+  getBalance(): number {
+    return this.Balance;
+  }
+
+ 
+  get AccNo(): number {
+    return this.Acc_no;
+  }   
+
+  get dataOfOpening(): Date {
+    return this.date_of_opening; 
+  } 
+}
+
+
+class Saving_Account extends Account {
+  private Min_Balance: number;
+
+  constructor(_Acc_no: number, _Balance: number, _date_of_opening: Date, _Min_Balance: number) {
+    super(_Acc_no, _Balance, _date_of_opening);
+    this.Min_Balance = _Min_Balance;
+  }
+
+  addCustomer(): void {
+    console.log(`Customer added to Saving Account ${this.Acc_no}`);
+  }
+
+  removeCustomer(): void {
+    console.log(`Customer removed from Saving Account ${this.Acc_no}`);
+  }
+
+  debitAmount(amount: number): boolean {
+    if (amount <= 0) {
+      console.log("Invalid amount");
+      return false;
+    }
+
+    if (this.Balance - amount >= this.Min_Balance) {
+      this.Balance -= amount;
+      console.log(`Debited: ${amount}. New Balance: ${this.Balance}`);
+      return true;
+    } else {
+      console.log(`Cannot debit. Minimum balance of ${this.Min_Balance}`);
+      return false;
+    }
+  }
+
+  getMinBalance(): number {
+    return this.Min_Balance;
+  }
+
+  setMinBalance(Min_Balance: number): void { 
+    this.Min_Balance = Min_Balance;
+  }
+}
+
+
+class Current_Account extends Account {
+  private Interest_rate: number;
+
+  constructor(_Acc_no: number, _Balance: number, _date_of_opening: Date, _Interest_rate: number) {
+    super(_Acc_no, _Balance, _date_of_opening);
+    this.Interest_rate = _Interest_rate;
+  }
+
+  addCustomer(): void {
+    console.log(`Customer added to Current Account ${this.Acc_no}`);
+  }
+
+  removeCustomer(): void {
+    console.log(`Customer removed from Current Account ${this.Acc_no}`);
+  } 
+
+  calculateInterest(): number {
+    return (this.Balance * this.Interest_rate) / 100;
+  }
+  
+  applyInterest(): void {
+    const Interest = this.calculateInterest();
+    this.Balance += Interest;
+    console.log(`Interest of ${Interest} applied. New Balance: ${this.Balance}`);
+  }
+
+  getInterestRate(): number { 
+    return this.Interest_rate;
+  }
+
+  setInterestRate(Interest_rate: number): void { 
+    this.Interest_rate = Interest_rate;
+  }
+}
+
